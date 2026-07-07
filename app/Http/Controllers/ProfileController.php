@@ -22,7 +22,7 @@ class ProfileController extends Controller
         $request->validate([
             'name' => ['required', 'string', 'max:255'],
             'password' => ['nullable', 'string', 'min:8', 'confirmed'],
-            'avatar' => ['nullable', 'image', 'max:2048'], // 2MB max
+            'avatar' => ['nullable', 'image', 'mimes:jpeg,jpg,png,gif,webp', 'max:2048'], // 2MB max
         ]);
 
         $user->name = $request->name;
@@ -32,16 +32,43 @@ class ProfileController extends Controller
         }
 
         if ($request->hasFile('avatar')) {
+            // Validate the file is actually uploaded properly
+            $file = $request->file('avatar');
+
             // Delete old avatar if exists
             if ($user->avatar) {
                 Storage::disk('public')->delete($user->avatar);
             }
-            $path = $request->file('avatar')->store('avatars', 'public');
+
+            // Store with a unique filename to prevent caching issues
+            $filename = 'avatar_' . $user->id . '_' . time() . '.' . $file->getClientOriginalExtension();
+            $path = $file->storeAs('avatars', $filename, 'public');
             $user->avatar = $path;
         }
 
         $user->save();
 
-        return redirect()->route('profile.edit')->with('success', 'Profile updated successfully.');
+        // Refresh the auth user instance so the new avatar shows immediately
+        Auth::setUser($user->fresh());
+
+        return redirect()->route('profile.edit')->with('success', 'Profil berhasil diperbarui! Foto profil Anda kini telah diperbarui.');
+    }
+
+    public function destroyAvatar()
+    {
+        $user = Auth::user();
+
+        if ($user->avatar) {
+            Storage::disk('public')->delete($user->avatar);
+            $user->avatar = null;
+            $user->save();
+
+            // Refresh the auth user instance
+            Auth::setUser($user->fresh());
+
+            return redirect()->route('profile.edit')->with('success', 'Foto profil berhasil dihapus.');
+        }
+
+        return redirect()->route('profile.edit')->withErrors(['avatar' => 'Tidak ada foto profil untuk dihapus.']);
     }
 }

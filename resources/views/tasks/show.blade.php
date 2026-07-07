@@ -1,63 +1,92 @@
 @extends('layouts.app')
 
 @section('content')
-<div style="margin-bottom: 20px;">
-    <a href="{{ route('tasks.index') }}" style="text-decoration: none; color: #007bff;">&larr; Back to Task List</a>
+<!-- Back navigation -->
+<div class="mb-4">
+    <a href="{{ route('tasks.index') }}" class="inline-flex items-center gap-1.5 text-xs font-semibold text-sky-600 hover:text-blue-700 transition-colors">
+        <i class="fa-solid fa-chevron-left text-[10px]"></i>
+        Back to Task List
+    </a>
 </div>
 
-<div style="display: flex; gap: 20px; flex-wrap: wrap;">
-    <!-- Main Issue Details -->
-    <div style="flex: 2; min-width: 350px; background: white; border: 1px solid #e0e0e0; border-radius: 6px; padding: 25px;">
-        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px;">
-            <div>
-                <span style="font-size: 14px; color: #888; font-weight: bold; text-transform: uppercase;">{{ $issue->type }}</span>
-                <h1 style="margin: 5px 0 0 0; font-size: 28px;">{{ $issue->id }}: {{ $issue->subject }}</h1>
+<!-- Main Details Layout grid -->
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+    
+    <!-- Left Column (2/3): Title, description, attachments -->
+    <div class="lg:col-span-2 space-y-6">
+        
+        <!-- Header container -->
+        <div class="bg-white border border-slate-100 rounded-3xl p-6 shadow-sm space-y-4">
+            <div class="flex flex-wrap items-start justify-between gap-4">
+                <div>
+                    <span class="px-2.5 py-1 text-[10px] font-bold rounded-lg uppercase tracking-wider 
+                        {{ $issue->type === 'Bug' ? 'bg-rose-50 text-rose-600 border border-rose-100' : '' }}
+                        {{ $issue->type === 'Improve' ? 'bg-sky-50 text-sky-600 border border-sky-100' : '' }}
+                        {{ $issue->type === 'Request' ? 'bg-slate-100 text-slate-600 border border-slate-200' : '' }}">
+                        {{ $issue->type }}
+                    </span>
+                    <h1 class="text-2xl font-extrabold text-slate-800 tracking-tight mt-3">
+                        <span class="text-slate-450 font-medium">#{{ $issue->id }}:</span> {{ $issue->subject }}
+                    </h1>
+                </div>
+                
+                <!-- Action Buttons -->
+                <div class="flex items-center gap-2">
+                    @can('update', $issue)
+                        <a href="{{ route('tasks.edit', $issue->id) }}" 
+                           class="inline-flex items-center gap-1.5 px-4 py-2 bg-sky-500 hover:bg-sky-600 text-white text-xs font-bold rounded-xl shadow-sm shadow-sky-100/50 transition-colors">
+                            <i class="fa-regular fa-pen-to-square"></i>
+                            <span>Edit Issue</span>
+                        </a>
+                    @endcan
+
+                    @can('delete', $issue)
+                        <form action="{{ route('tasks.destroy', $issue->id) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin menghapus issue ini?');" class="m-0">
+                            @csrf
+                            @method('DELETE')
+                            <button type="submit" 
+                                    class="inline-flex items-center gap-1.5 px-4 py-2 bg-rose-50 hover:bg-rose-100 text-rose-600 hover:text-rose-700 text-xs font-bold rounded-xl transition-colors border border-rose-100">
+                                <i class="fa-regular fa-trash-can"></i>
+                                <span>Delete</span>
+                            </button>
+                        </form>
+                    @endcan
+                </div>
             </div>
             
-            <div style="display: flex; gap: 10px;">
-                @can('update', $issue)
-                    <a href="{{ route('tasks.edit', $issue->id) }}" style="background-color: #007bff; color: white; padding: 8px 16px; border-radius: 4px; text-decoration: none; font-weight: bold; font-size: 14px;">
-                        Edit Issue
-                    </a>
-                @endcan
-
-                @can('delete', $issue)
-                    <form action="{{ route('tasks.destroy', $issue->id) }}" method="POST" onsubmit="return confirm('Are you sure you want to delete this issue?');" style="margin: 0;">
-                        @csrf
-                        @method('DELETE')
-                        <button type="submit" style="background-color: #dc3545; color: white; border: none; padding: 8px 16px; border-radius: 4px; font-weight: bold; font-size: 14px; cursor: pointer;">
-                            Delete
-                        </button>
-                    </form>
-                @endcan
+            <div class="border-t border-slate-100 pt-4">
+                <h3 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">Description</h3>
+                <div class="bg-slate-50 border border-slate-100 rounded-2xl p-4 md:p-5 text-sm text-slate-700 leading-relaxed whitespace-pre-line">
+                    {{ $issue->description }}
+                </div>
             </div>
         </div>
 
-        <div style="margin-bottom: 25px;">
-            <h3 style="margin-bottom: 8px; border-bottom: 1px solid #f0f0f0; padding-bottom: 5px; color: #555;">Description</h3>
-            <p style="white-space: pre-line; line-height: 1.6; color: #333; margin: 0;">{{ $issue->description }}</p>
-        </div>
-
-        <!-- Attachments Section -->
-        <div style="margin-bottom: 25px;">
-            <h3 style="margin-bottom: 10px; border-bottom: 1px solid #f0f0f0; padding-bottom: 5px; color: #555;">Attachments</h3>
+        <!-- Attachments Card -->
+        <div class="bg-white border border-slate-100 rounded-3xl p-6 shadow-sm space-y-4">
+            <h3 class="text-xs font-bold text-slate-400 uppercase tracking-widest border-b border-slate-100 pb-3 flex items-center gap-2">
+                <i class="fa-solid fa-paperclip text-sm text-slate-400"></i> Attachments
+            </h3>
+            
             @if($issue->attachments->isEmpty())
-                <p style="color: #777; font-style: italic;">No attachments uploaded for this issue.</p>
+                <div class="py-6 text-center text-slate-400 text-xs italic">
+                    Belum ada berkas lampiran yang diunggah untuk issue ini.
+                </div>
             @else
-                <ul style="list-style: none; padding-left: 0; display: flex; flex-direction: column; gap: 12px; margin: 0;">
+                <ul class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     @foreach($issue->attachments as $attachment)
-                        <li style="border: 1px solid #e8e8e8; padding: 10px; border-radius: 4px; display: flex; align-items: center; justify-content: space-between; background: #fdfdfd;">
-                            <div>
-                                <a href="{{ asset('storage/' . $attachment->file_path) }}" target="_blank" style="font-weight: bold; text-decoration: none; color: #007bff;">
+                        <li class="border border-slate-100 bg-slate-50/50 rounded-2xl p-3 flex items-center justify-between gap-3 hover:bg-slate-50 transition-colors duration-150">
+                            <div class="overflow-hidden">
+                                <a href="{{ asset('storage/' . $attachment->file_path) }}" target="_blank" class="font-bold text-xs text-sky-600 hover:text-blue-700 truncate block">
                                     {{ $attachment->file_name }}
                                 </a>
-                                <small style="display: block; color: #888;">Uploaded at {{ $attachment->created_at->format('d M Y, H:i') }}</small>
+                                <small class="text-[10px] text-slate-400 block mt-0.5">Uploaded {{ $attachment->created_at->format('d M Y, H:i') }}</small>
                             </div>
                             
-                            <!-- Image preview if image file -->
+                            <!-- Image preview if image file extension -->
                             @if(in_array(strtolower(pathinfo($attachment->file_name, PATHINFO_EXTENSION)), ['jpg', 'jpeg', 'png', 'gif', 'webp']))
-                                <a href="{{ asset('storage/' . $attachment->file_path) }}" target="_blank">
-                                    <img src="{{ asset('storage/' . $attachment->file_path) }}" style="max-height: 50px; border-radius: 4px; border: 1px solid #ccc;" alt="Preview">
+                                <a href="{{ asset('storage/' . $attachment->file_path) }}" target="_blank" class="shrink-0">
+                                    <img src="{{ asset('storage/' . $attachment->file_path) }}" class="max-h-11 rounded-lg border border-slate-200/50 shadow-sm" alt="Preview">
                                 </a>
                             @endif
                         </li>
@@ -67,64 +96,91 @@
         </div>
     </div>
 
-    <!-- Sidebar Meta & History logs -->
-    <div style="flex: 1; min-width: 300px; display: flex; flex-direction: column; gap: 20px;">
-        <!-- Meta Details Box -->
-        <div style="background: white; border: 1px solid #e0e0e0; border-radius: 6px; padding: 20px;">
-            <h3 style="margin-top: 0; margin-bottom: 15px; border-bottom: 1px solid #f0f0f0; padding-bottom: 5px; color: #555;">Details</h3>
+    <!-- Right Column (1/3): Sidebar Info & Activity Logs -->
+    <div class="space-y-6">
+        <!-- Metadata Info box -->
+        <div class="bg-white border border-slate-100 rounded-3xl p-6 shadow-sm space-y-4">
+            <h3 class="text-xs font-bold text-slate-400 uppercase tracking-widest border-b border-slate-100 pb-3">Details Meta</h3>
             
-            <div style="display: flex; flex-direction: column; gap: 12px; font-size: 14px;">
-                <div>
-                    <strong style="color: #666; display: block; margin-bottom: 2px;">Status</strong>
+            <div class="divide-y divide-slate-100 text-xs">
+                <div class="py-3 flex justify-between items-center">
+                    <span class="font-semibold text-slate-400">Status</span>
                     <span class="badge status-{{ strtolower(str_replace(' ', '', $issue->status)) }}">
                         {{ $issue->status }}
                     </span>
                 </div>
                 
-                <div>
-                    <strong style="color: #666; display: block; margin-bottom: 2px;">Priority</strong>
+                <div class="py-3 flex justify-between items-center">
+                    <span class="font-semibold text-slate-400">Priority</span>
                     @if($issue->priority == 'Low')
-                        <span class="priority-low">↓ Low</span>
+                        <span class="inline-flex items-center gap-1.5 font-bold text-blue-600">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="3" stroke="currentColor" class="w-3.5 h-3.5">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m0 0l6.75-6.75M12 19.5l-6.75-6.75" />
+                            </svg>
+                            Low
+                        </span>
                     @elseif($issue->priority == 'Medium')
-                        <span class="priority-medium">→ Medium</span>
+                        <span class="inline-flex items-center gap-1.5 font-bold text-amber-600">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="3" stroke="currentColor" class="w-3.5 h-3.5">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12h15m0 0l-6.75-6.75M19.5 12l-6.75 6.75" />
+                            </svg>
+                            Medium
+                        </span>
                     @else
-                        <span class="priority-high">↑ High</span>
+                        <span class="inline-flex items-center gap-1.5 font-bold text-rose-600">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="3" stroke="currentColor" class="w-3.5 h-3.5">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 19.5v-15m0 0l-6.75 6.75M12 4.5l6.75 6.75" />
+                            </svg>
+                            High
+                        </span>
                     @endif
                 </div>
 
-                <div>
-                    <strong style="color: #666; display: block; margin-bottom: 2px;">Created By</strong>
-                    <span>{{ $issue->creator->name }} (Client)</span>
+                <div class="py-3 flex justify-between items-center">
+                    <span class="font-semibold text-slate-400">Created By</span>
+                    <span class="font-bold text-slate-700 bg-slate-50 border border-slate-200/50 rounded-md px-1.5 py-0.5 text-[10px]">{{ $issue->creator->name }} (Client)</span>
                 </div>
 
-                <div>
-                    <strong style="color: #666; display: block; margin-bottom: 2px;">Assigned Worker</strong>
+                <div class="py-3 flex justify-between items-center">
+                    <span class="font-semibold text-slate-400">Assigned To</span>
                     @if($issue->assignedTo)
-                        <span>{{ $issue->assignedTo->name }}</span>
+                        <span class="font-bold text-slate-705 text-[10px]">{{ $issue->assignedTo->name }}</span>
                     @else
-                        <span style="color: #999; font-style: italic;">None</span>
+                        <span class="italic text-slate-400">Unassigned</span>
                     @endif
                 </div>
 
-                <div>
-                    <strong style="color: #666; display: block; margin-bottom: 2px;">Reported Date</strong>
-                    <span>{{ $issue->created_at->format('d M Y, H:i') }} ({{ $issue->created_at->diffForHumans() }})</span>
+                <div class="py-3 flex justify-between items-center">
+                    <span class="font-semibold text-slate-400">Reported</span>
+                    <span class="text-slate-500 font-medium text-[10px]" title="{{ $issue->created_at->format('d M Y, H:i') }}">
+                        {{ $issue->created_at->diffForHumans() }}
+                    </span>
                 </div>
             </div>
         </div>
 
-        <!-- Issue Activity Log / History -->
-        <div style="background: white; border: 1px solid #e0e0e0; border-radius: 6px; padding: 20px;">
-            <h3 style="margin-top: 0; margin-bottom: 15px; border-bottom: 1px solid #f0f0f0; padding-bottom: 5px; color: #555;">Activity Log</h3>
+        <!-- Mini Activity timeline log -->
+        <div class="bg-white border border-slate-100 rounded-3xl p-6 shadow-sm space-y-4">
+            <h3 class="text-xs font-bold text-slate-400 uppercase tracking-widest border-b border-slate-100 pb-3 flex items-center gap-2">
+                <i class="fa-solid fa-route text-sm text-slate-450"></i> Activity Log
+            </h3>
             
             @if($issue->histories->isEmpty())
-                <p style="color: #777; font-style: italic; font-size: 13px;">No history recorded.</p>
+                <div class="py-4 text-center text-slate-400 text-xs italic">
+                    Belum ada log aktivitas penugasan.
+                </div>
             @else
-                <ul style="list-style: none; padding-left: 0; margin: 0; display: flex; flex-direction: column; gap: 12px; font-size: 13px;">
+                <ul class="flex flex-col gap-4 text-xs">
                     @foreach($issue->histories as $history)
-                        <li style="border-bottom: 1px solid #f9f9f9; padding-bottom: 6px;">
-                            <strong>{{ $history->user->name }}</strong>: {{ $history->description }}
-                            <div style="color: #999; font-size: 11px; margin-top: 2px;">
+                        <li class="relative pl-4 border-l-2 border-slate-100 last:border-0 pb-1">
+                            <!-- timeline dot marker -->
+                            <div class="absolute -left-[5px] top-1 w-2.5 h-2.5 rounded-full bg-slate-200"></div>
+                            
+                            <div>
+                                <strong class="text-slate-800">{{ $history->user->name }}</strong>
+                                <span class="text-slate-650 ml-0.5 leading-relaxed">{{ $history->description }}</span>
+                            </div>
+                            <div class="text-[10px] text-slate-400 mt-1">
                                 {{ $history->created_at->format('d M Y, H:i') }} ({{ $history->created_at->diffForHumans() }})
                             </div>
                         </li>
@@ -132,6 +188,8 @@
                 </ul>
             @endif
         </div>
+        
     </div>
+
 </div>
 @endsection

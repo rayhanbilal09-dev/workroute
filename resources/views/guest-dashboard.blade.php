@@ -1,220 +1,214 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="h-full bg-slate-50">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Workroute - Issue Tracking System</title>
+    <title>Workroute - Public Issue Tracker</title>
+    <!-- Tailwind CSS Play CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Plus Jakarta Sans', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Google Fonts: Plus Jakarta Sans -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- FontAwesome Free Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.3/css/all.min.css">
+    
     <style>
         body {
-            font-family: sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #f9f9f9;
-            color: #333;
+            font-family: 'Plus Jakarta Sans', sans-serif;
         }
-        .navbar {
-            background: white;
-            border-bottom: 1px solid #e0e0e0;
-            padding: 15px 30px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        .navbar h1 {
-            margin: 0;
-            font-size: 22px;
-        }
-        .navbar-links a {
-            text-decoration: none;
-            color: #007bff;
-            font-weight: 500;
-            margin-left: 15px;
-        }
-        .navbar-links a:hover {
-            text-decoration: underline;
-        }
-        .container {
-            max-width: 1000px;
-            margin: 30px auto;
-            padding: 0 20px;
-        }
-        .hero {
-            background: white;
-            border: 1px solid #e0e0e0;
-            border-radius: 6px;
-            padding: 30px;
-            text-align: center;
-            margin-bottom: 25px;
-        }
-        .hero h2 {
-            margin-top: 0;
-        }
-        .hero p {
-            color: #666;
-            max-width: 600px;
-            margin: 10px auto 20px;
-        }
-        .hero a {
-            display: inline-block;
-            background: #007bff;
-            color: white;
-            text-decoration: none;
-            padding: 10px 25px;
-            border-radius: 4px;
-            font-weight: bold;
-            margin: 0 5px;
-        }
-        .hero a.secondary {
-            background: #6c757d;
-        }
-        .stats-grid {
-            display: flex;
-            gap: 15px;
-            margin-bottom: 25px;
-            flex-wrap: wrap;
-        }
-        .stat-card {
-            background: white;
-            border: 1px solid #e0e0e0;
-            border-radius: 6px;
-            padding: 15px 25px;
-            flex: 1;
-            min-width: 120px;
-        }
-        .stat-card h4 {
-            margin: 0 0 5px 0;
-            color: #666;
-            font-size: 13px;
-        }
-        .stat-card span {
-            font-size: 28px;
-            font-weight: bold;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            background: white;
-        }
-        th, td {
-            padding: 12px;
-            border: 1px solid #e0e0e0;
-            text-align: left;
-        }
-        th {
-            background-color: #f5f5f5;
-        }
+        /* Custom legacy class styling for backward compatibility with view templates */
         .badge {
-            padding: 4px 8px;
-            border-radius: 4px;
-            font-size: 12px;
-            font-weight: bold;
+            display: inline-flex;
+            align-items: center;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            line-height: 1.2;
         }
-        .status-unassigned { background-color: #e0e0e0; color: #333; }
-        .status-assigned { background-color: #ffe8d6; color: #d9534f; }
-        .status-inprogress { background-color: #fff3cd; color: #856404; }
-        .status-complete { background-color: #d4edda; color: #155724; }
-        .notice {
-            background: #fff3cd;
-            border: 1px solid #ffc107;
-            color: #856404;
-            padding: 10px 15px;
-            border-radius: 4px;
-            margin-bottom: 20px;
-            text-align: center;
-        }
+        .status-unassigned { background-color: #f3f4f6; color: #4b5563; }
+        .status-assigned { background-color: #e0f2fe; color: #0284c7; }
+        .status-inprogress { background-color: #fef3c7; color: #b55e09; }
+        .status-complete { background-color: #d1fae5; color: #065f46; }
     </style>
 </head>
-<body>
+<body class="min-h-full flex flex-col text-slate-800">
 
-    <div class="navbar">
-        <h1>Workroute</h1>
-        <div class="navbar-links">
-            <a href="{{ route('login') }}">Login</a>
-            <a href="{{ route('register') }}">Register</a>
-        </div>
-    </div>
-
-    <div class="container">
-
-        <div class="hero">
-            <h2>Issue Tracking System</h2>
-            <p>Workroute membantu tim Anda mengelola issues, melacak progress pekerjaan, dan berkomunikasi secara efisien.</p>
-            <a href="{{ route('login') }}">Login</a>
-            <a href="{{ route('register') }}" class="secondary">Register</a>
-        </div>
-
-        <div class="notice">
-            Anda sedang melihat sebagai Guest. Silakan <a href="{{ route('login') }}">login</a> untuk membuat issues, mengelola tugas, dan menggunakan chat.
-        </div>
-
-        <!-- Stats Overview (read-only) -->
-        <div class="stats-grid">
-            <div class="stat-card">
-                <h4>Total Issues</h4>
-                <span>{{ $stats['total'] }}</span>
+    <!-- Header Navigation -->
+    <header class="bg-white border-b border-slate-200/80 sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <div class="flex items-center gap-2.5">
+                <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-sky-400 to-blue-500 flex items-center justify-center shadow-sm">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4 text-white">
+                        <circle cx="6" cy="19" r="3"/>
+                        <path d="M9 19h8.5a3.5 3.5 0 0 0 0-7h-11a3.5 3.5 0 0 1 0-7H15"/>
+                        <circle cx="18" cy="5" r="3"/>
+                    </svg>
+                </div>
+                <span class="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-slate-900 to-blue-600 tracking-tight">Workroute</span>
             </div>
-            <div class="stat-card">
-                <h4>Unassigned</h4>
-                <span style="color: #555;">{{ $stats['unassigned'] }}</span>
-            </div>
-            <div class="stat-card">
-                <h4>Assigned</h4>
-                <span style="color: #d9534f;">{{ $stats['assigned'] }}</span>
-            </div>
-            <div class="stat-card">
-                <h4>In Progress</h4>
-                <span style="color: #856404;">{{ $stats['in_progress'] }}</span>
-            </div>
-            <div class="stat-card">
-                <h4>Complete</h4>
-                <span style="color: #155724;">{{ $stats['complete'] }}</span>
+            
+            <div class="flex items-center gap-3">
+                <a href="{{ route('login') }}" class="px-4 py-2 text-sm font-semibold text-slate-600 hover:text-slate-950 transition-colors">
+                    Login
+                </a>
+                <a href="{{ route('register') }}" class="px-4 py-2 text-sm font-semibold bg-sky-500 text-white rounded-xl hover:bg-sky-600 shadow-sm shadow-sky-100 transition-colors">
+                    Register
+                </a>
             </div>
         </div>
+    </header>
 
-        <!-- Recent Issues (read-only, no actions) -->
-        <div style="background: white; border: 1px solid #e0e0e0; border-radius: 6px; padding: 20px;">
-            <h3 style="margin-top: 0;">Recent Issues</h3>
+    <!-- Main public container -->
+    <main class="flex-grow max-w-5xl w-full mx-auto px-4 py-8 md:py-12 space-y-8">
+        
+        <!-- Hero section -->
+        <div class="bg-white border border-slate-100 rounded-3xl p-8 md:p-12 text-center shadow-sm relative overflow-hidden">
+            <div class="absolute -top-24 -left-20 w-48 h-48 bg-sky-50 rounded-full blur-3xl opacity-60"></div>
+            <div class="absolute -bottom-24 -right-20 w-48 h-48 bg-blue-50 rounded-full blur-3xl opacity-60"></div>
+
+            <div class="relative space-y-4">
+                <span class="px-3 py-1 bg-sky-50 border border-sky-100 text-sky-600 rounded-full text-xs font-bold uppercase tracking-wider">
+                    Task & Issue Tracking
+                </span>
+                <h2 class="text-3xl md:text-4xl font-extrabold text-slate-900 tracking-tight max-w-2xl mx-auto leading-tight">
+                    Optimalkan pengelolaan issues & melacak progress tim secara real-time
+                </h2>
+                <p class="text-slate-500 text-sm md:text-base max-w-xl mx-auto leading-relaxed">
+                    Workroute mempermudah koordinasi pendaftaran bug, pengembangan fitur baru, dan interaksi langsung antar tim dan klien.
+                </p>
+                <div class="pt-4 flex items-center justify-center gap-4">
+                    <a href="{{ route('login') }}" class="px-6 py-3 font-bold text-sm bg-sky-500 text-white rounded-2xl hover:bg-sky-600 shadow-md shadow-sky-100 transition-colors">
+                        Mulai Sekarang
+                    </a>
+                    <a href="{{ route('register') }}" class="px-6 py-3 font-bold text-sm bg-slate-100 text-slate-700 rounded-2xl hover:bg-slate-200 transition-colors">
+                        Buat Akun Baru
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Guest View Notice banner -->
+        <div class="bg-amber-50 border border-amber-100 rounded-2xl p-4 flex items-start gap-3">
+            <i class="fa-solid fa-circle-exclamation text-amber-500 text-lg mt-0.5"></i>
+            <div class="text-xs md:text-sm text-amber-800">
+                <span>Anda sedang mengakses Workroute sebagai <strong>Guest</strong>. Beberapa fitur hanya dapat digunakan setelah login. Silakan </span>
+                <a href="{{ route('login') }}" class="font-bold underline hover:text-amber-950">Login disini</a>
+                <span> untuk membuat issue, membalas chat, atau meninjau penugasan.</span>
+            </div>
+        </div>
+
+        <!-- Stats Overview -->
+        <div class="grid grid-cols-2 md:grid-cols-5 gap-4">
+            <!-- Total -->
+            <div class="bg-white border border-slate-100 rounded-2xl p-4 shadow-sm">
+                <p class="text-[11px] font-semibold text-slate-400 uppercase tracking-widest">Total Issues</p>
+                <span class="text-2xl font-bold text-slate-800 block mt-2">{{ $stats['total'] }}</span>
+            </div>
+            <!-- Unassigned -->
+            <div class="bg-white border border-slate-100 rounded-2xl p-4 shadow-sm">
+                <p class="text-[11px] font-semibold text-slate-400 uppercase tracking-widest">Unassigned</p>
+                <span class="text-2xl font-bold text-slate-500 block mt-2">{{ $stats['unassigned'] }}</span>
+            </div>
+            <!-- Assigned -->
+            <div class="bg-white border border-slate-100 rounded-2xl p-4 shadow-sm">
+                <p class="text-[11px] font-semibold text-slate-400 uppercase tracking-widest">Assigned</p>
+                <span class="text-2xl font-bold text-sky-600 block mt-2">{{ $stats['assigned'] }}</span>
+            </div>
+            <!-- In Progress -->
+            <div class="bg-white border border-slate-100 rounded-2xl p-4 shadow-sm">
+                <p class="text-[11px] font-semibold text-slate-400 uppercase tracking-widest">In Progress</p>
+                <span class="text-2xl font-bold text-amber-600 block mt-2">{{ $stats['in_progress'] }}</span>
+            </div>
+            <!-- Complete -->
+            <div class="bg-white border border-slate-100 rounded-2xl p-4 shadow-sm">
+                <p class="text-[11px] font-semibold text-slate-400 uppercase tracking-widest">Complete</p>
+                <span class="text-2xl font-bold text-emerald-600 block mt-2">{{ $stats['complete'] }}</span>
+            </div>
+        </div>
+
+        <!-- Recent Public Issues Table -->
+        <div class="bg-white border border-slate-100 rounded-3xl p-6 shadow-sm">
+            <h3 class="text-base font-bold text-slate-800 mb-4 flex items-center gap-2">
+                <i class="fa-solid fa-earth-americas text-slate-400"></i> Recent Public Issues
+            </h3>
+            
             @if($recentIssues->isEmpty())
-                <p style="color: #777;">No issues found.</p>
+                <div class="flex flex-col items-center justify-center py-10 text-center">
+                    <i class="fa-solid fa-cubes text-3xl text-slate-200 mb-2"></i>
+                    <p class="text-slate-400 text-sm">Tidak ada issues yang terdaftar saat ini.</p>
+                </div>
             @else
-                <table>
-                    <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>Subject</th>
-                            <th>Type</th>
-                            <th>Status</th>
-                            <th>Priority</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach($recentIssues as $issue)
-                            <tr>
-                                <td style="font-weight: bold;">{{ $issue->id }}</td>
-                                <td>{{ $issue->subject }}</td>
-                                <td>{{ $issue->type }}</td>
-                                <td>
-                                    <span class="badge status-{{ strtolower(str_replace(' ', '', $issue->status)) }}">
-                                        {{ $issue->status }}
-                                    </span>
-                                </td>
-                                <td>
-                                    @if($issue->priority == 'Low')
-                                        <span style="color: green; font-weight: bold;">↓ Low</span>
-                                    @elseif($issue->priority == 'Medium')
-                                        <span style="color: orange; font-weight: bold;">→ Medium</span>
-                                    @else
-                                        <span style="color: red; font-weight: bold;">↑ High</span>
-                                    @endif
-                                </td>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-sm whitespace-nowrap">
+                        <thead>
+                            <tr class="border-b border-slate-100 text-slate-400 text-xs font-semibold uppercase tracking-wider">
+                                <th class="pb-3 pr-4">ID</th>
+                                <th class="pb-3 pr-4">Subject</th>
+                                <th class="pb-3 pr-4">Type</th>
+                                <th class="pb-3 pr-4">Status</th>
+                                <th class="pb-3">Priority</th>
                             </tr>
-                        @endforeach
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody class="divide-y divide-slate-100/50">
+                            @foreach($recentIssues as $issue)
+                                <tr class="hover:bg-slate-50/50 transition-colors duration-150">
+                                    <td class="py-3.5 pr-4 font-bold text-slate-700">
+                                        #{{ $issue->id }}
+                                    </td>
+                                    <td class="py-3.5 pr-4 font-medium text-slate-800 max-w-sm truncate">
+                                        {{ $issue->subject }}
+                                    </td>
+                                    <td class="py-3.5 pr-4 text-xs font-semibold text-slate-500">
+                                        {{ $issue->type }}
+                                    </td>
+                                    <td class="py-3.5 pr-4">
+                                        <span class="badge status-{{ strtolower(str_replace(' ', '', $issue->status)) }}">
+                                            {{ $issue->status }}
+                                        </span>
+                                    </td>
+                                    <td class="py-3.5">
+                                        @if($issue->priority == 'Low')
+                                            <span class="inline-flex items-center justify-center w-7 h-7 rounded-xl bg-blue-50 text-blue-600 border border-blue-100/50 shadow-sm" title="Low">
+                                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="3" stroke="currentColor" class="w-3.5 h-3.5">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m0 0l6.75-6.75M12 19.5l-6.75-6.75" />
+                                                </svg>
+                                            </span>
+                                        @elseif($issue->priority == 'Medium')
+                                            <span class="inline-flex items-center justify-center w-7 h-7 rounded-xl bg-amber-50 text-amber-600 border border-amber-100/50 shadow-sm" title="Medium">
+                                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="3" stroke="currentColor" class="w-3.5 h-3.5">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12h15m0 0l-6.75-6.75M19.5 12l-6.75 6.75" />
+                                                </svg>
+                                            </span>
+                                        @else
+                                            <span class="inline-flex items-center justify-center w-7 h-7 rounded-xl bg-rose-50 text-rose-600 border border-rose-100/50 shadow-sm" title="High">
+                                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="3" stroke="currentColor" class="w-3.5 h-3.5">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 19.5v-15m0 0l-6.75 6.75M12 4.5l6.75 6.75" />
+                                                </svg>
+                                            </span>
+                                        @endif
+                                    </td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
             @endif
         </div>
 
-    </div>
+    </main>
 
 </body>
 </html>

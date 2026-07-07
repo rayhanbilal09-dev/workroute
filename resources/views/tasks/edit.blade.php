@@ -1,80 +1,114 @@
 @extends('layouts.app')
 
 @section('content')
-<div style="margin-bottom: 20px;">
-    <a href="{{ route('tasks.show', $issue->id) }}" style="text-decoration: none; color: #007bff;">&larr; Back to Issue Detail</a>
-    <h1 style="margin-top: 10px;">Edit Issue: {{ $issue->id }}</h1>
+<!-- Back Line -->
+<div class="mb-4">
+    <a href="{{ route('tasks.show', $issue->id) }}" class="inline-flex items-center gap-1.5 text-xs font-semibold text-sky-600 hover:text-blue-750 transition-colors">
+        <i class="fa-solid fa-chevron-left text-[10px]"></i>
+        Back to Issue Detail
+    </a>
 </div>
 
-<div style="background: white; border: 1px solid #e0e0e0; border-radius: 6px; padding: 25px; max-width: 700px;">
-    <form action="{{ route('tasks.update', $issue->id) }}" method="POST" enctype="multipart/form-data">
+<!-- Form Container Card -->
+<div class="max-w-2xl bg-white border border-slate-100 rounded-3xl p-6 md:p-8 shadow-sm space-y-6">
+    <div>
+        <h1 class="text-xl md:text-2xl font-bold text-slate-800 tracking-tight">Edit Issue #{{ $issue->id }}</h1>
+        <p class="text-slate-400 text-xs mt-1">Perbarui detail penugasan, ubah status progress, atau unggah lampiran tambahan.</p>
+    </div>
+
+    <form action="{{ route('tasks.update', $issue->id) }}" method="POST" enctype="multipart/form-data" class="space-y-5">
         @csrf
         @method('PUT')
 
         @if(auth()->user()->isAdmin())
-            <!-- Admin Field: Edit Everything -->
-            <div style="margin-bottom: 15px;">
-                <label for="type" style="display: block; font-weight: bold; margin-bottom: 5px;">Issue Type</label>
-                <select id="type" name="type" style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;" required>
+            <!-- Admin Fields: Edit Everything -->
+            
+            <!-- Type Selection -->
+            <div class="space-y-1.5">
+                <label for="type" class="text-xs font-bold text-slate-650 tracking-wide uppercase">Issue Type</label>
+                <select id="type" name="type" 
+                        class="w-full bg-slate-50 border border-slate-200/80 rounded-2xl px-4 py-3 text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 transition-all font-semibold" required>
                     <option value="Bug" {{ old('type', $issue->type) == 'Bug' ? 'selected' : '' }}>Bug</option>
                     <option value="Improve" {{ old('type', $issue->type) == 'Improve' ? 'selected' : '' }}>Improve</option>
                     <option value="Request" {{ old('type', $issue->type) == 'Request' ? 'selected' : '' }}>Request</option>
                 </select>
             </div>
 
-            <div style="margin-bottom: 15px;">
-                <label for="subject" style="display: block; font-weight: bold; margin-bottom: 5px;">Subject</label>
-                <input type="text" id="subject" name="subject" value="{{ old('subject', $issue->subject) }}" style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;" required>
+            <!-- Subject Input -->
+            <div class="space-y-1.5">
+                <label for="subject" class="text-xs font-bold text-slate-650 tracking-wide uppercase">Subject</label>
+                <input type="text" id="subject" name="subject" value="{{ old('subject', $issue->subject) }}" 
+                       class="w-full bg-slate-50 border border-slate-200/80 rounded-2xl px-4 py-3 text-sm text-slate-700 placeholder:text-slate-450 focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 transition-all" required>
             </div>
 
-            <div style="margin-bottom: 15px;">
-                <label for="description" style="display: block; font-weight: bold; margin-bottom: 5px;">Description</label>
-                <textarea id="description" name="description" rows="6" style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;" required>{{ old('description', $issue->description) }}</textarea>
+            <!-- Description Input -->
+            <div class="space-y-1.5">
+                <label for="description" class="text-xs font-bold text-slate-650 tracking-wide uppercase">Description</label>
+                <textarea id="description" name="description" rows="5" 
+                          class="w-full bg-slate-50 border border-slate-200/80 rounded-2xl px-4 py-3 text-sm text-slate-700 placeholder:text-slate-450 focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 transition-all" required>{{ old('description', $issue->description) }}</textarea>
             </div>
 
-            <div style="margin-bottom: 15px;">
-                <label for="priority" style="display: block; font-weight: bold; margin-bottom: 5px;">Priority</label>
-                <select id="priority" name="priority" style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;" required>
-                    <option value="Low" {{ old('priority', $issue->priority) == 'Low' ? 'selected' : '' }}>Low</option>
-                    <option value="Medium" {{ old('priority', $issue->priority) == 'Medium' ? 'selected' : '' }}>Medium</option>
-                    <option value="High" {{ old('priority', $issue->priority) == 'High' ? 'selected' : '' }}>High</option>
-                </select>
-            </div>
+            <!-- Meta details Grid -->
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 border-t border-slate-100 pt-4">
+                
+                <!-- Priority -->
+                <div class="space-y-1.5">
+                    <label for="priority" class="text-xs font-bold text-slate-650 tracking-wide uppercase">Priority</label>
+                    <select id="priority" name="priority" 
+                            class="w-full bg-slate-50 border border-slate-200/80 rounded-2xl px-4 py-3 text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 transition-all" required>
+                        <option value="Low" {{ old('priority', $issue->priority) == 'Low' ? 'selected' : '' }}>Low</option>
+                        <option value="Medium" {{ old('priority', $issue->priority) == 'Medium' ? 'selected' : '' }}>Medium</option>
+                        <option value="High" {{ old('priority', $issue->priority) == 'High' ? 'selected' : '' }}>High</option>
+                    </select>
+                </div>
 
-            <div style="margin-bottom: 15px;">
-                <label for="assigned_to" style="display: block; font-weight: bold; margin-bottom: 5px;">Assign To (Worker)</label>
-                <select id="assigned_to" name="assigned_to" style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
-                    <option value="">-- Select Worker (Optional) --</option>
-                    @foreach($workers as $worker)
-                        <option value="{{ $worker->id }}" {{ old('assigned_to', $issue->assigned_to) == $worker->id ? 'selected' : '' }}>
-                            {{ $worker->name }}
-                        </option>
-                    @endforeach
-                </select>
-            </div>
+                <!-- Assigned To -->
+                <div class="space-y-1.5">
+                    <label for="assigned_to" class="text-xs font-bold text-slate-650 tracking-wide uppercase">Assign To (Worker)</label>
+                    <select id="assigned_to" name="assigned_to" 
+                            class="w-full bg-slate-50 border border-slate-200/80 rounded-2xl px-4 py-3 text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 transition-all">
+                        <option value="">-- Select Worker --</option>
+                        @foreach($workers as $worker)
+                            <option value="{{ $worker->id }}" {{ old('assigned_to', $issue->assigned_to) == $worker->id ? 'selected' : '' }}>
+                                {{ $worker->name }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
 
-            <div style="margin-bottom: 15px;">
-                <label for="status" style="display: block; font-weight: bold; margin-bottom: 5px;">Status</label>
-                <select id="status" name="status" style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;" required>
-                    <option value="Unassigned" {{ old('status', $issue->status) == 'Unassigned' ? 'selected' : '' }}>Unassigned</option>
-                    <option value="Assigned" {{ old('status', $issue->status) == 'Assigned' ? 'selected' : '' }}>Assigned</option>
-                    <option value="In Progress" {{ old('status', $issue->status) == 'In Progress' ? 'selected' : '' }}>In Progress</option>
-                    <option value="Complete" {{ old('status', $issue->status) == 'Complete' ? 'selected' : '' }}>Complete</option>
-                </select>
+                <!-- Status Selection -->
+                <div class="space-y-1.5">
+                    <label for="status" class="text-xs font-bold text-slate-650 tracking-wide uppercase">Status</label>
+                    <select id="status" name="status" 
+                            class="w-full bg-slate-50 border border-slate-200/80 rounded-2xl px-4 py-3 text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 transition-all font-semibold" required>
+                        <option value="Unassigned" {{ old('status', $issue->status) == 'Unassigned' ? 'selected' : '' }}>Unassigned</option>
+                        <option value="Assigned" {{ old('status', $issue->status) == 'Assigned' ? 'selected' : '' }}>Assigned</option>
+                        <option value="In Progress" {{ old('status', $issue->status) == 'In Progress' ? 'selected' : '' }}>In Progress</option>
+                        <option value="Complete" {{ old('status', $issue->status) == 'Complete' ? 'selected' : '' }}>Complete</option>
+                    </select>
+                </div>
+
             </div>
 
         @elseif(auth()->user()->isWorker())
-            <!-- Worker Field: ONLY edit Status -->
-            <div style="margin-bottom: 15px; background-color: #f0f4f8; padding: 15px; border-radius: 4px; border-left: 4px solid #007bff; font-size: 14px;">
-                <p style="margin: 0 0 8px 0;"><strong>Issue Details (Read Only):</strong></p>
-                <p style="margin: 0;"><strong>Type:</strong> {{ $issue->type }}</p>
-                <p style="margin: 4px 0;"><strong>Subject:</strong> {{ $issue->subject }}</p>
-                <p style="margin: 0;"><strong>Description:</strong> {{ $issue->description }}</p>
+            <!-- Worker Fields: ONLY edit Status -->
+            <div class="bg-indigo-50/50 border border-indigo-150 rounded-2xl p-4 text-xs text-indigo-900 space-y-2">
+                <p class="font-bold text-slate-900 flex items-center gap-1.5">
+                    <i class="fa-solid fa-circle-exclamation text-indigo-500"></i>
+                    Issue Details (Read Only)
+                </p>
+                <div class="grid grid-cols-2 gap-y-2 mt-2 border-t border-indigo-100/50 pt-2 font-medium text-slate-700">
+                    <div>Type: <span class="font-semibold text-slate-900">{{ $issue->type }}</span></div>
+                    <div>Subject: <span class="font-semibold text-slate-900">{{ $issue->subject }}</span></div>
+                    <div class="col-span-2">Description: <span class="font-semibold text-slate-900">{{ $issue->description }}</span></div>
+                </div>
             </div>
 
-            <div style="margin-bottom: 15px;">
-                <label for="status" style="display: block; font-weight: bold; margin-bottom: 5px;">Status</label>
-                <select id="status" name="status" style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;" required>
+            <!-- Worker Option: Status Selection only -->
+            <div class="space-y-1.5 border-t border-slate-100 pt-4">
+                <label for="status" class="text-xs font-bold text-slate-650 tracking-wide uppercase">Update Progress Status</label>
+                <select id="status" name="status" 
+                        class="w-full bg-slate-50 border border-slate-200/80 rounded-2xl px-4 py-3 text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 transition-all font-semibold" required>
                     <option value="Assigned" {{ old('status', $issue->status) == 'Assigned' ? 'selected' : '' }}>Assigned</option>
                     <option value="In Progress" {{ old('status', $issue->status) == 'In Progress' ? 'selected' : '' }}>In Progress</option>
                     <option value="Complete" {{ old('status', $issue->status) == 'Complete' ? 'selected' : '' }}>Complete</option>
@@ -82,43 +116,67 @@
             </div>
 
         @elseif(auth()->user()->isClient())
-            <!-- Client Field: Edit details (ONLY if status is Unassigned) -->
+            <!-- Client Fields: Edit details (ONLY if status is Unassigned) -->
             @if($issue->status === 'Unassigned')
-                <div style="margin-bottom: 15px;">
-                    <label for="type" style="display: block; font-weight: bold; margin-bottom: 5px;">Issue Type</label>
-                    <select id="type" name="type" style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;" required>
+                
+                <!-- Type Selection -->
+                <div class="space-y-1.5">
+                    <label for="type" class="text-xs font-bold text-slate-650 tracking-wide uppercase">Issue Type</label>
+                    <select id="type" name="type" 
+                            class="w-full bg-slate-50 border border-slate-200/80 rounded-2xl px-4 py-3 text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 transition-all font-semibold" required>
                         <option value="Bug" {{ old('type', $issue->type) == 'Bug' ? 'selected' : '' }}>Bug</option>
                         <option value="Improve" {{ old('type', $issue->type) == 'Improve' ? 'selected' : '' }}>Improve</option>
                         <option value="Request" {{ old('type', $issue->type) == 'Request' ? 'selected' : '' }}>Request</option>
                     </select>
                 </div>
 
-                <div style="margin-bottom: 15px;">
-                    <label for="subject" style="display: block; font-weight: bold; margin-bottom: 5px;">Subject</label>
-                    <input type="text" id="subject" name="subject" value="{{ old('subject', $issue->subject) }}" style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;" required>
+                <!-- Subject -->
+                <div class="space-y-1.5">
+                    <label for="subject" class="text-xs font-bold text-slate-650 tracking-wide uppercase">Subject</label>
+                    <input type="text" id="subject" name="subject" value="{{ old('subject', $issue->subject) }}" 
+                           class="w-full bg-slate-50 border border-slate-200/80 rounded-2xl px-4 py-3 text-sm text-slate-700 placeholder:text-slate-450 focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 transition-all" required>
                 </div>
 
-                <div style="margin-bottom: 15px;">
-                    <label for="description" style="display: block; font-weight: bold; margin-bottom: 5px;">Description</label>
-                    <textarea id="description" name="description" rows="6" style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;" required>{{ old('description', $issue->description) }}</textarea>
+                <!-- Description -->
+                <div class="space-y-1.5">
+                    <label for="description" class="text-xs font-bold text-slate-650 tracking-wide uppercase">Description</label>
+                    <textarea id="description" name="description" rows="5" 
+                              class="w-full bg-slate-50 border border-slate-200/80 rounded-2xl px-4 py-3 text-sm text-slate-700 placeholder:text-slate-450 focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 transition-all" required>{{ old('description', $issue->description) }}</textarea>
                 </div>
+
             @else
-                <div style="background-color: #f8d7da; color: #721c24; padding: 15px; border-radius: 4px; border: 1px solid #f5c6cb; margin-bottom: 15px;">
-                    You can no longer edit this issue because it has been assigned or processed (Status: <strong>{{ $issue->status }}</strong>).
+                <div class="bg-rose-50 border border-rose-100 text-rose-800 rounded-2xl p-4 flex gap-3 text-sm">
+                    <i class="fa-solid fa-circle-exclamation text-rose-500 mt-0.5"></i>
+                    <div>
+                        <strong>Maaf, Formulir Terkunci:</strong> Anda tidak lagi dapat mengubah detail issue ini karena saat ini status pekerjaan telah diproses/ditugaskan (Status: <strong class="underline">{{ $issue->status }}</strong>).
+                    </div>
                 </div>
             @endif
         @endif
 
+        <!-- File Upload Section (If not worker, and either admin or unassigned status client) -->
         @if(!auth()->user()->isWorker() && ($issue->status === 'Unassigned' || auth()->user()->isAdmin()))
-            <div style="margin-bottom: 25px;">
-                <label for="attachments" style="display: block; font-weight: bold; margin-bottom: 5px;">Add More Attachments (Multiple Files)</label>
-                <input type="file" id="attachments" name="attachments[]" accept="image/*,application/zip,application/x-rar-compressed,application/x-zip-compressed,.zip,.rar" style="width: 100%;" multiple>
+            <div class="space-y-2 border-t border-slate-100 pt-4">
+                <label for="attachments" class="text-xs font-bold text-slate-650 tracking-wide uppercase block">Add More Attachments (Multiple Files)</label>
+                <div class="w-full border-2 border-dashed border-slate-200 rounded-2xl p-4 hover:bg-slate-50 transition-colors duration-150 relative flex flex-col items-center justify-center text-center cursor-pointer">
+                    <i class="fa-solid fa-plus text-slate-350 text-xl mb-1"></i>
+                    <p class="text-xs text-slate-500 font-medium">Klik untuk menambahkan file lampiran baru</p>
+                    <input type="file" id="attachments" name="attachments[]" accept="image/*,application/zip,application/x-rar-compressed,application/x-zip-compressed,.zip,.rar" 
+                           class="absolute inset-0 opacity-0 cursor-pointer" w-full h-full multiple>
+                </div>
             </div>
         @endif
 
-        <button type="submit" style="background-color: #007bff; color: white; border: none; padding: 10px 20px; font-size: 16px; border-radius: 4px; cursor: pointer; font-weight: bold;">
-            Update Issue
-        </button>
+        <!-- Submit Group -->
+        <div class="pt-4 border-t border-slate-100 flex items-center justify-end gap-3">
+            <a href="{{ route('tasks.show', $issue->id) }}" class="px-5 py-2.5 rounded-2xl text-sm font-bold text-slate-500 hover:bg-slate-50 transition-colors">
+                Cancel
+            </a>
+            <button type="submit" 
+                    class="px-6 py-2.5 bg-sky-500 hover:bg-sky-600 text-white text-sm font-bold rounded-2xl shadow-md shadow-sky-100 transition-colors">
+                Update Issue
+            </button>
+        </div>
     </form>
 </div>
 @endsection
