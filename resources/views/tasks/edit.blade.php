@@ -34,11 +34,29 @@
                 </select>
             </div>
 
-            <!-- Subject Input -->
+            <!-- Subject Selection -->
             <div class="space-y-1.5">
                 <label for="subject" class="text-xs font-bold text-slate-650 tracking-wide uppercase">Subject</label>
-                <input type="text" id="subject" name="subject" value="{{ old('subject', $issue->subject) }}" 
+                <select id="subject" name="subject" required
+                        class="w-full bg-slate-50 border border-slate-200/80 rounded-2xl px-4 py-3 text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 transition-all font-semibold">
+                    <option value="LPM UKP" {{ old('subject', $issue->subject) == 'LPM UKP' ? 'selected' : '' }}>LPM UKP</option>
+                    <option value="Social Lens" {{ old('subject', $issue->subject) == 'Social Lens' ? 'selected' : '' }}>Social Lens</option>
+                    <option value="SellerPro" {{ old('subject', $issue->subject) == 'SellerPro' ? 'selected' : '' }}>SellerPro</option>
+                </select>
+            </div>
+
+            <!-- Title Input -->
+            <div class="space-y-1.5">
+                <label for="title" class="text-xs font-bold text-slate-650 tracking-wide uppercase">Title</label>
+                <input type="text" id="title" name="title" value="{{ old('title', $issue->title) }}"
                        class="w-full bg-slate-50 border border-slate-200/80 rounded-2xl px-4 py-3 text-sm text-slate-700 placeholder:text-slate-450 focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 transition-all" required>
+            </div>
+
+            <!-- Deadline Input -->
+            <div class="space-y-1.5">
+                <label for="deadline" class="text-xs font-bold text-slate-650 tracking-wide uppercase">Deadline</label>
+                <input type="date" id="deadline" name="deadline" value="{{ old('deadline', optional($issue->deadline)->format('Y-m-d')) }}"
+                       class="w-full bg-slate-50 border border-slate-200/80 rounded-2xl px-4 py-3 text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 transition-all">
             </div>
 
             <!-- Description Input -->
@@ -133,8 +151,26 @@
                 <!-- Subject -->
                 <div class="space-y-1.5">
                     <label for="subject" class="text-xs font-bold text-slate-650 tracking-wide uppercase">Subject</label>
-                    <input type="text" id="subject" name="subject" value="{{ old('subject', $issue->subject) }}" 
+                    <select id="subject" name="subject" required
+                            class="w-full bg-slate-50 border border-slate-200/80 rounded-2xl px-4 py-3 text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 transition-all font-semibold">
+                        <option value="LPM UKP" {{ old('subject', $issue->subject) == 'LPM UKP' ? 'selected' : '' }}>LPM UKP</option>
+                        <option value="Social Lens" {{ old('subject', $issue->subject) == 'Social Lens' ? 'selected' : '' }}>Social Lens</option>
+                        <option value="SellerPro" {{ old('subject', $issue->subject) == 'SellerPro' ? 'selected' : '' }}>SellerPro</option>
+                    </select>
+                </div>
+
+                <!-- Title -->
+                <div class="space-y-1.5">
+                    <label for="title" class="text-xs font-bold text-slate-650 tracking-wide uppercase">Title</label>
+                    <input type="text" id="title" name="title" value="{{ old('title', $issue->title) }}"
                            class="w-full bg-slate-50 border border-slate-200/80 rounded-2xl px-4 py-3 text-sm text-slate-700 placeholder:text-slate-450 focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 transition-all" required>
+                </div>
+
+                <!-- Deadline -->
+                <div class="space-y-1.5">
+                    <label for="deadline" class="text-xs font-bold text-slate-650 tracking-wide uppercase">Deadline</label>
+                    <input type="date" id="deadline" name="deadline" value="{{ old('deadline', optional($issue->deadline)->format('Y-m-d')) }}"
+                           class="w-full bg-slate-50 border border-slate-200/80 rounded-2xl px-4 py-3 text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 transition-all">
                 </div>
 
                 <!-- Description -->

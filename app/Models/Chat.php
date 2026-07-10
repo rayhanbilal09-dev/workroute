@@ -10,6 +10,7 @@ class Chat extends Model
     protected $fillable = [
         'sender_id',
         'receiver_id',
+        'group_chat_id',
         'message',
         'is_group',
     ];
@@ -22,5 +23,10 @@ class Chat extends Model
     public function receiver(): BelongsTo
     {
         return $this->belongsTo(User::class, 'receiver_id');
+    }
+
+    public function group(): BelongsTo
+    {
+        return $this->belongsTo(GroupChat::class, 'group_chat_id');
     }
 }

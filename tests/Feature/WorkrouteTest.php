@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use App\Models\Chat;
 use App\Models\Issue;
 use App\Models\User;
+use App\Models\GroupChat;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -42,14 +43,16 @@ class WorkrouteTest extends TestCase
 
         $issue1 = Issue::create([
             'type' => 'Bug',
-            'subject' => 'First issue',
+            'subject' => 'LPM UKP',
+            'title' => 'Title 1',
             'description' => 'Description 1',
             'creator_id' => $client->id,
         ]);
 
         $issue2 = Issue::create([
             'type' => 'Request',
-            'subject' => 'Second issue',
+            'subject' => 'Social Lens',
+            'title' => 'Title 2',
             'description' => 'Description 2',
             'creator_id' => $client->id,
         ]);
@@ -58,8 +61,15 @@ class WorkrouteTest extends TestCase
         $this->assertEquals('ISS-002', $issue2->id);
     }
 
-    public function test_client_cannot_access_group_chat_but_admin_and_worker_can()
+    public function test_all_roles_can_access_group_chat_but_only_admin_can_manage_groups()
     {
+        $admin = User::create([
+            'name' => 'Admin',
+            'email' => 'admin@example.com',
+            'role' => 'admin',
+            'password' => bcrypt('password'),
+        ]);
+
         $client = User::create([
             'name' => 'Client',
             'email' => 'client@example.com',
@@ -74,15 +84,59 @@ class WorkrouteTest extends TestCase
             'password' => bcrypt('password'),
         ]);
 
-        // Client gets 403 on group chat
+        // Client gets 200 on new groups route list
         $this->actingAs($client)
-            ->get('/chat/group')
+            ->get('/chat/groups')
+            ->assertStatus(200);
+
+        // Worker gets 200 on groups route list
+        $this->actingAs($worker)
+            ->get('/chat/groups')
+            ->assertStatus(200);
+
+        // Client cannot create group
+        $this->actingAs($client)
+            ->get('/chat/groups/create')
             ->assertStatus(403);
 
-        // Worker gets 200 on group chat
+        $this->actingAs($client)
+            ->post('/chat/groups', ['name' => 'Should fail'])
+            ->assertStatus(403);
+
+        // Worker cannot create group
         $this->actingAs($worker)
-            ->get('/chat/group')
+            ->get('/chat/groups/create')
+            ->assertStatus(403);
+
+        // Admin can access create group page
+        $this->actingAs($admin)
+            ->get('/chat/groups/create')
             ->assertStatus(200);
+    }
+
+    public function test_worker_cannot_create_issue()
+    {
+        $worker = User::create([
+            'name' => 'Worker',
+            'email' => 'worker@example.com',
+            'role' => 'worker',
+            'password' => bcrypt('password'),
+        ]);
+
+        // Worker cannot see the create issue view
+        $this->actingAs($worker)
+            ->get(route('tasks.create'))
+            ->assertStatus(403);
+
+        // Worker cannot store an issue
+        $this->actingAs($worker)
+            ->post(route('tasks.store'), [
+                'type' => 'Bug',
+                'subject' => 'LPM UKP',
+                'title' => 'Worker title',
+                'description' => 'Worker description',
+            ])
+            ->assertStatus(403);
     }
 
     public function test_worker_cannot_edit_or_delete_issue()
@@ -103,20 +157,20 @@ class WorkrouteTest extends TestCase
 
         $issue = Issue::create([
             'type' => 'Bug',
-            'subject' => 'Test Issue',
+            'subject' => 'LPM UKP',
+            'title' => 'Test Issue',
             'description' => 'Test',
             'creator_id' => $admin->id,
             'assigned_to' => $worker->id,
             'status' => 'Assigned',
         ]);
 
-        // Worker cannot edit fields (or they get redirected or not allowed on edit page)
-        // Note: they are authorized to status edit, but not general edit.
-        // Let's check edit route permission
+        // Worker is allowed to access the edit page (to update status)
         $this->actingAs($worker)
             ->get(route('tasks.edit', $issue->id))
-            ->assertStatus(200); // Because they can update status. But let's check DELETE which they can never do.
+            ->assertStatus(200);
         
+        // But worker is NOT allowed to delete
         $this->actingAs($worker)
             ->delete(route('tasks.destroy', $issue->id))
             ->assertStatus(403);
@@ -140,7 +194,8 @@ class WorkrouteTest extends TestCase
 
         $issueUnassigned = Issue::create([
             'type' => 'Bug',
-            'subject' => 'Unassigned Issue',
+            'subject' => 'LPM UKP',
+            'title' => 'Unassigned Issue',
             'description' => 'Test',
             'creator_id' => $client->id,
             'status' => 'Unassigned',
@@ -148,7 +203,8 @@ class WorkrouteTest extends TestCase
 
         $issueAssigned = Issue::create([
             'type' => 'Bug',
-            'subject' => 'Assigned Issue',
+            'subject' => 'Social Lens',
+            'title' => 'Assigned Issue',
             'description' => 'Test',
             'creator_id' => $client->id,
             'assigned_to' => $worker->id,

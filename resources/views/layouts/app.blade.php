@@ -94,6 +94,15 @@
                             <span>Activity History</span>
                         </a>
                     </li>
+                    @if(auth()->user()->isAdmin())
+                    <li>
+                        <a href="{{ route('users.index') }}" 
+                           class="flex items-center gap-3 px-3 py-2.5 rounded-2xl text-sm font-medium transition-all duration-150 {{ request()->routeIs('users.*') ? 'bg-sky-50 text-sky-600 font-semibold shadow-sm shadow-sky-100/30' : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900' }}">
+                            <i class="fa-solid fa-users-gear text-base text-slate-400 {{ request()->routeIs('users.*') ? 'text-sky-500' : '' }}"></i>
+                            <span>Kelola Akun</span>
+                        </a>
+                    </li>
+                    @endif
                 </ul>
             </div>
 
@@ -107,15 +116,13 @@
                             <span>Individual Chat</span>
                         </a>
                     </li>
-                    @if(auth()->user()->role !== 'client')
-                        <li>
-                            <a href="{{ route('chat.group') }}" 
-                               class="flex items-center gap-3 px-3 py-2.5 rounded-2xl text-sm font-medium transition-all duration-150 {{ request()->routeIs('chat.group') ? 'bg-sky-50 text-sky-600 font-semibold shadow-sm shadow-sky-100/30' : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900' }}">
-                                <i class="fa-solid fa-users text-base text-slate-400 {{ request()->routeIs('chat.group') ? 'text-sky-500' : '' }}"></i>
-                                <span>Group Chat</span>
-                            </a>
-                        </li>
-                    @endif
+                    <li>
+                        <a href="{{ route('chat.group') }}" 
+                           class="flex items-center gap-3 px-3 py-2.5 rounded-2xl text-sm font-medium transition-all duration-150 {{ request()->routeIs('chat.group*') ? 'bg-sky-50 text-sky-600 font-semibold shadow-sm shadow-sky-100/30' : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900' }}">
+                            <i class="fa-solid fa-users text-base text-slate-400 {{ request()->routeIs('chat.group*') ? 'text-sky-500' : '' }}"></i>
+                            <span>Group Chat</span>
+                        </a>
+                    </li>
                 </ul>
             </div>
         </nav>

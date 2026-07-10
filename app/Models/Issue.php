@@ -17,9 +17,15 @@ class Issue extends Model
         'status',
         'priority',
         'subject',
+        'title',
         'description',
+        'deadline',
         'assigned_to',
         'creator_id',
+    ];
+
+    protected $casts = [
+        'deadline' => 'date',
     ];
 
     protected static function booted()

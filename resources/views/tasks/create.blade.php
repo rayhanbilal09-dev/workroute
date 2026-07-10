@@ -30,12 +30,30 @@
             </select>
         </div>
 
-        <!-- Subject Input -->
+        <!-- Subject Selection -->
         <div class="space-y-1.5">
             <label for="subject" class="text-xs font-bold text-slate-650 tracking-wide uppercase">Subject</label>
-            <input type="text" id="subject" name="subject" value="{{ old('subject') }}" 
-                   class="w-full bg-slate-50 border border-slate-200/80 rounded-2xl px-4 py-3 text-sm text-slate-700 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 transition-all" 
-                   placeholder="Issue title or summary" required>
+            <select id="subject" name="subject" required
+                    class="w-full bg-slate-50 border border-slate-200/80 rounded-2xl px-4 py-3 text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 transition-all font-semibold">
+                <option value="LPM UKP" {{ old('subject') == 'LPM UKP' ? 'selected' : '' }}>LPM UKP</option>
+                <option value="Social Lens" {{ old('subject') == 'Social Lens' ? 'selected' : '' }}>Social Lens</option>
+                <option value="SellerPro" {{ old('subject') == 'SellerPro' ? 'selected' : '' }}>SellerPro</option>
+            </select>
+        </div>
+
+        <!-- Title Input -->
+        <div class="space-y-1.5">
+            <label for="title" class="text-xs font-bold text-slate-650 tracking-wide uppercase">Title</label>
+            <input type="text" id="title" name="title" value="{{ old('title') }}"
+                   class="w-full bg-slate-50 border border-slate-200/80 rounded-2xl px-4 py-3 text-sm text-slate-700 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 transition-all"
+                   placeholder="Judul tugas singkat" required>
+        </div>
+
+        <!-- Deadline Input -->
+        <div class="space-y-1.5">
+            <label for="deadline" class="text-xs font-bold text-slate-650 tracking-wide uppercase">Deadline</label>
+            <input type="date" id="deadline" name="deadline" value="{{ old('deadline') }}"
+                   class="w-full bg-slate-50 border border-slate-200/80 rounded-2xl px-4 py-3 text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 transition-all">
         </div>
 
         <!-- Description Area -->

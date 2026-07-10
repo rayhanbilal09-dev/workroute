@@ -12,17 +12,48 @@ use Illuminate\Support\Facades\Gate;
 
 class IssueController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
         $user = Auth::user();
+        $query = Issue::with(['assignedTo', 'creator']);
 
         if ($user->isAdmin()) {
-            $issues = Issue::with(['assignedTo', 'creator'])->latest()->get();
+            // no additional restriction
         } elseif ($user->isWorker()) {
-            $issues = Issue::with(['assignedTo', 'creator'])->where('assigned_to', $user->id)->latest()->get();
+            $query->where('assigned_to', $user->id);
         } else {
-            $issues = Issue::with(['assignedTo', 'creator'])->where('creator_id', $user->id)->latest()->get();
+            $query->where('creator_id', $user->id);
         }
+
+        if ($request->filled('subject')) {
+            $query->where('subject', $request->subject);
+        }
+
+        if ($request->filled('priority')) {
+            $query->where('priority', $request->priority);
+        }
+
+        if ($request->filled('type')) {
+            $query->where('type', $request->type);
+        }
+
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
+        }
+
+        if ($request->filled('deadline')) {
+            $query->whereDate('deadline', $request->deadline);
+        }
+
+        if ($request->filled('search')) {
+            $query->where('title', 'like', '%' . $request->search . '%');
+        }
+
+        $issues = $query
+            ->orderByRaw("CASE WHEN priority = 'High' THEN 1 WHEN priority = 'Medium' THEN 2 WHEN priority = 'Low' THEN 3 ELSE 4 END")
+            ->orderBy('deadline', 'asc')
+            ->orderBy('created_at', 'desc')
+            ->get();
 
         return view('tasks.index', compact('issues'));
     }
@@ -47,7 +78,9 @@ class IssueController extends Controller
 
         $rules = [
             'type' => ['required', 'in:Bug,Improve,Request'],
-            'subject' => ['required', 'string', 'max:255'],
+            'subject' => ['required', 'in:LPM UKP,Social Lens,SellerPro'],
+            'title' => ['required', 'string', 'max:255'],
+            'deadline' => ['nullable', 'date'],
             'description' => ['required', 'string'],
             'attachments.*' => ['nullable', 'file', 'max:10240'], // 10MB limit per file
         ];
@@ -64,6 +97,8 @@ class IssueController extends Controller
         $data = [
             'type' => $request->type,
             'subject' => $request->subject,
+            'title' => $request->title,
+            'deadline' => $request->deadline,
             'description' => $request->description,
             'creator_id' => $user->id,
             'status' => 'Unassigned',
@@ -159,7 +194,9 @@ class IssueController extends Controller
                 'type' => ['required', 'in:Bug,Improve,Request'],
                 'status' => ['required', 'in:Unassigned,Assigned,In Progress,Complete'],
                 'priority' => ['required', 'in:Low,Medium,High'],
-                'subject' => ['required', 'string', 'max:255'],
+                'subject' => ['required', 'in:LPM UKP,Social Lens,SellerPro'],
+                'title' => ['required', 'string', 'max:255'],
+                'deadline' => ['nullable', 'date'],
                 'description' => ['required', 'string'],
                 'assigned_to' => ['nullable', 'exists:users,id'],
                 'attachments.*' => ['nullable', 'file', 'max:10240'],
@@ -170,6 +207,8 @@ class IssueController extends Controller
                 'status' => $request->status,
                 'priority' => $request->priority,
                 'subject' => $request->subject,
+                'title' => $request->title,
+                'deadline' => $request->deadline,
                 'description' => $request->description,
                 'assigned_to' => $request->assigned_to,
             ]);
@@ -187,7 +226,9 @@ class IssueController extends Controller
             // Client can only edit if status is Unassigned
             $request->validate([
                 'type' => ['required', 'in:Bug,Improve,Request'],
-                'subject' => ['required', 'string', 'max:255'],
+                'subject' => ['required', 'in:LPM UKP,Social Lens,SellerPro'],
+                'title' => ['required', 'string', 'max:255'],
+                'deadline' => ['nullable', 'date'],
                 'description' => ['required', 'string'],
                 'attachments.*' => ['nullable', 'file', 'max:10240'],
             ]);
@@ -195,6 +236,8 @@ class IssueController extends Controller
             $issue->update([
                 'type' => $request->type,
                 'subject' => $request->subject,
+                'title' => $request->title,
+                'deadline' => $request->deadline,
                 'description' => $request->description,
             ]);
         }
