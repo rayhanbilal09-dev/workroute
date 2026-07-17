@@ -176,6 +176,55 @@ class WorkrouteTest extends TestCase
             ->assertStatus(403);
     }
 
+    public function test_admin_can_filter_issues_by_assigned_worker()
+    {
+        $admin = User::create([
+            'name' => 'Admin',
+            'email' => 'admin@example.com',
+            'role' => 'admin',
+            'password' => bcrypt('password'),
+        ]);
+
+        $workerOne = User::create([
+            'name' => 'Worker One',
+            'email' => 'worker1@example.com',
+            'role' => 'worker',
+            'password' => bcrypt('password'),
+        ]);
+
+        $workerTwo = User::create([
+            'name' => 'Worker Two',
+            'email' => 'worker2@example.com',
+            'role' => 'worker',
+            'password' => bcrypt('password'),
+        ]);
+
+        $issueOne = Issue::create([
+            'type' => 'Bug',
+            'subject' => 'LPM UKP',
+            'title' => 'Issue assigned to worker one',
+            'description' => 'Test',
+            'creator_id' => $admin->id,
+            'assigned_to' => $workerOne->id,
+            'status' => 'Assigned',
+        ]);
+
+        $issueTwo = Issue::create([
+            'type' => 'Bug',
+            'subject' => 'Social Lens',
+            'title' => 'Issue assigned to worker two',
+            'description' => 'Test',
+            'creator_id' => $admin->id,
+            'assigned_to' => $workerTwo->id,
+            'status' => 'Assigned',
+        ]);
+
+        $this->actingAs($admin)
+            ->get(route('tasks.index', ['assigned_to' => $workerOne->id]))
+            ->assertSee($issueOne->title)
+            ->assertDontSee($issueTwo->title);
+    }
+
     public function test_client_can_edit_or_delete_issue_only_when_unassigned()
     {
         $client = User::create([

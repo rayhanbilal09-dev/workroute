@@ -41,6 +41,10 @@ class IssueController extends Controller
             $query->where('status', $request->status);
         }
 
+        if ($request->filled('assigned_to')) {
+            $query->where('assigned_to', $request->assigned_to);
+        }
+
         if ($request->filled('deadline')) {
             $query->whereDate('deadline', $request->deadline);
         }
@@ -55,7 +59,9 @@ class IssueController extends Controller
             ->orderBy('created_at', 'desc')
             ->get();
 
-        return view('tasks.index', compact('issues'));
+        $workers = User::where('role', 'worker')->orderBy('name')->get();
+
+        return view('tasks.index', compact('issues', 'workers'));
     }
 
     public function create()
